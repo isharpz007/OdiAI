@@ -1,64 +1,153 @@
-I don't have write permissions to the repository. However, I can provide you with the complete README content that you can add to the repository yourself.
-
-Here's the comprehensive README I've generated for OdiAI:
-
-```markdown
 # 🤖 OdiAI
 
-An intelligent voice-activated AI assistant powered by local language models and advanced audio processing. OdiAI listens for voice commands, understands natural language, and responds intelligently through speech synthesis.
+**A voice-activated AI assistant that runs entirely on your machine.**
+
+OdiAI listens for a wake word, transcribes what you say, reasons about it with a local LLM via [Ollama](https://ollama.ai), and speaks the answer back to you — no cloud API keys, no data leaving your computer.
+
+<p align="left">
+  <img alt="Python" src="https://img.shields.io/badge/python-3.8%2B-blue">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
+  <img alt="Ollama" src="https://img.shields.io/badge/powered%20by-Ollama-black">
+</p>
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [How It Works](#how-it-works)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Core Modules](#core-modules)
+- [Skills System](#skills-system)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+---
 
 ## Features
 
-- 🎤 **Voice Recognition** - Captures and transcribes spoken commands
-- 🧠 **AI-Powered Responses** - Uses Ollama with LLaMA 3.2 for intelligent reasoning
-- 🔊 **Text-to-Speech** - Converts AI responses to natural-sounding voice output
-- 🌐 **Web Search** - Can perform web searches to find current information
-- 💾 **Memory System** - Remembers user information (like names) across sessions
-- 🎯 **Wake Word Detection** - Responds to "Hey OdiAI" voice activation
-- 🔌 **Skill System** - Extensible architecture for adding custom skills
+| | |
+|---|---|
+| 🎯 **Wake Word Detection** | Responds to "Hey OdiAI" — no button presses needed |
+| 🎤 **Voice Recognition** | Captures and transcribes spoken commands in real time |
+| 🧠 **Local AI Reasoning** | Powered by Ollama running LLaMA 3.2 — fully offline inference |
+| 🔊 **Text-to-Speech** | Converts responses into natural-sounding voice output |
+| 💾 **Persistent Memory** | Remembers user details (like your name) across sessions |
+| 🌐 **Web Search** | Looks up current information when local knowledge isn't enough |
+| 🔌 **Extensible Skills** | Drop-in skill modules for custom commands and integrations |
+
+## How It Works
+
+```
+🎙️  Wake word          "Hey OdiAI"
+        ↓
+📝  Transcription       listener.py + transcribe.py
+        ↓
+🧠  Reasoning           brain.py → skills check → memory check → Ollama (llama3.2:3b)
+        ↓
+🔊  Speech output       voice.py
+```
 
 ## Prerequisites
 
-Before running OdiAI, ensure you have the following installed:
-
 - **Python 3.8+**
-- **Ollama** - Download from [ollama.ai](https://ollama.ai)
-- **PyAudio** - For audio input/output
-- **Necessary LLaMA Models** - Download via Ollama
-
-### System Requirements
-
-- Microphone for voice input
-- Speakers or headphones for audio output
-- Sufficient disk space for LLaMA models (~5GB+ recommended)
+- **[Ollama](https://ollama.ai)** installed and running locally
+- **A working microphone and speakers/headphones**
+- **~5 GB free disk space** for the LLaMA model
 
 ## Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/isharpz007/OdiAI.git
-   cd OdiAI
-   ```
+**1. Clone the repository**
 
-2. **Install Python dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-   
-   Key dependencies include:
-   - `ollama` - LLM integration
-   - `pyaudio` - Audio recording
-   - `pyttsx3` or `gtts` - Text-to-speech
-   - `SpeechRecognition` - Audio transcription
-   - `pywake-word` - Wake word detection
+```bash
+git clone https://github.com/isharpz007/OdiAI.git
+cd OdiAI
+```
 
-3. **Install and Run Ollama**
-   - Download from [ollama.ai](https://ollama.ai)
-   - Ensure the Ollama service is running on `http://127.0.0.1:11434`
-   - Pull the LLaMA model:
-     ```bash
-     ollama pull llama3.2:3b
-     ```
+**2. Install Python dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+Key packages installed:
+
+| Package | Purpose |
+|---|---|
+| `ollama` | LLM integration |
+| `pyaudio` | Audio recording |
+| `pyttsx3` / `gtts` | Text-to-speech |
+| `SpeechRecognition` | Audio transcription |
+| `pywake-word` | Wake word detection |
+
+**3. Install and start Ollama**
+
+```bash
+ollama serve
+ollama pull llama3.2:3b
+```
+
+By default, OdiAI expects Ollama at `http://127.0.0.1:11434`.
+
+**4. Verify the setup**
+
+```bash
+python test_microphone.py
+python test_api.py
+```
+
+## Usage
+
+### Voice-Activated Mode (recommended)
+
+```bash
+python main.py
+```
+
+1. Say **"Hey OdiAI"**
+2. Wait for the assistant to respond with **"Yes?"**
+3. Speak your command
+4. Listen to the spoken response
+
+### Interactive Mode (no wake word)
+
+```bash
+python assistant.py
+```
+
+1. Press **Enter** when prompted
+2. Speak your command (records for ~5 seconds)
+3. The AI processes and replies
+4. Say **"exit"**, **"quit"**, or **"goodbye"** to end the session
+
+### Example Commands
+
+| Say this | OdiAI does this |
+|---|---|
+| "My name is John" | Saves your name to memory |
+| "What is my name?" | Recalls it from memory |
+| "Search python tutorials" | Runs a web search |
+| "What is the capital of France?" | Answers a general knowledge question |
+| "Tell me a joke" | Generates a creative response |
+
+## Configuration
+
+All settings live in `config.py`:
+
+| Setting | Description | Default |
+|---|---|---|
+| Ollama host/port | Location of the Ollama service | `http://127.0.0.1:11434` |
+| Model name | Ollama model used for reasoning | `llama3.2:3b` |
+| Wake word | Phrase that triggers listening | `"hey odiai"` (case-insensitive) |
+| Audio settings | Sample rate, channels, recording duration | see file |
 
 ## Project Structure
 
@@ -77,186 +166,111 @@ OdiAI/
 ├── commands.py          # Command handling
 ├── chat.py              # Chat utilities
 ├── config.py            # Configuration settings
-├── skills/              # Extensible skill modules
-│   ├── apps.py         # Application control skill
-│   └── web.py          # Web search skill
-├── data/                # Data storage directory
-├── tests/               # Test files
-└── voice.wav           # Sample audio file
+├── skills/
+│   ├── apps.py           # Application control skill
+│   └── web.py            # Web search skill
+├── data/                 # Data storage directory
+├── tests/                # Test files
+└── voice.wav             # Sample audio file
 ```
-
-## Usage
-
-### Mode 1: Voice-Activated Mode (Wake Word)
-
-```bash
-python main.py
-```
-
-This mode listens for the wake word "Hey OdiAI" and then processes commands:
-1. Say "Hey OdiAI"
-2. Wait for the assistant to respond with "Yes?"
-3. Give your command
-4. Listen to the AI's response
-
-### Mode 2: Interactive Mode
-
-```bash
-python assistant.py
-```
-
-This mode allows you to interact without needing wake words:
-1. Press ENTER when prompted
-2. Speak your command (it will record for ~5 seconds)
-3. The AI will process and respond
-4. Say "exit", "quit", or "goodbye" to end the session
-
-### Example Commands
-
-- "What is my name?" - Recalls previously saved name
-- "My name is John" - Saves your name to memory
-- "Search python tutorials" - Performs a web search
-- "What is the capital of France?" - General knowledge questions
-- "Tell me a joke" - Creative responses
-
-## Configuration
-
-Edit `config.py` to customize:
-
-- **Ollama host/port** - Location of Ollama service
-- **Model name** - Default: `llama3.2:3b` (can change to other Ollama models)
-- **Audio settings** - Sample rate, channels, duration
-- **Wake word** - Currently "hey odiai" (case-insensitive)
 
 ## Core Modules
 
-### `brain.py`
-The intelligence engine that:
-- Processes user prompts
-- Checks for app skills first
-- Manages learning (name memorization)
-- Performs web searches
-- Communicates with Ollama for AI responses
-- Maintains conversation history
-
-### `voice.py`
-Handles text-to-speech conversion for AI responses.
-
-### `listener.py` & `wake_word.py`
-Handle audio capture and wake word detection using speech recognition.
-
-### `memory.py`
-Persistent storage system for user information using JSON.
-
-### `conversation.py`
-Manages conversation history for context-aware responses.
+- **`brain.py`** — The reasoning engine. Checks skills first, then memory, then falls back to Ollama for a general response; also maintains conversation history.
+- **`voice.py`** — Converts AI text responses into speech.
+- **`listener.py` / `wake_word.py`** — Handle audio capture and wake-word detection.
+- **`memory.py`** — Persists user information to `memory.json`.
+- **`conversation.py`** — Tracks conversation history for context-aware replies.
 
 ## Skills System
 
-OdiAI has an extensible skills system in the `skills/` directory:
+Skills live in `skills/` and let you extend OdiAI with custom commands.
 
-- **apps.py** - Execute application-specific commands
-- **web.py** - Perform web searches
+To add a new skill:
 
-To add a new skill, create a new module in the `skills/` directory with a `run()` function that returns a response string if the skill matches the command.
+1. Create a new module in `skills/`
+2. Implement a `run()` function that returns a response string when the skill matches the command
+3. OdiAI's `brain.py` will pick it up automatically on the next command check
+
+Included by default:
+
+- **`apps.py`** — Executes application-specific commands
+- **`web.py`** — Performs web searches
 
 ## Testing
 
-Several test files are included:
-- `test_api.py` - Test Ollama API integration
-- `test_ai.py` - Test AI response generation
-- `test_memory.py` - Test memory functionality
-- `test_microphone.py` - Test audio input
-- `test_record.py` - Test audio recording
-
-Run tests with:
 ```bash
-python test_ai.py
-python test_api.py
-python test_memory.py
+python test_ai.py          # AI response generation
+python test_api.py         # Ollama API integration
+python test_memory.py      # Memory persistence
+python test_microphone.py  # Audio input
+python test_record.py      # Audio recording
 ```
 
 ## Troubleshooting
 
-### Ollama Connection Error
-- Ensure Ollama is running: `ollama serve`
-- Check host is `http://127.0.0.1:11434`
-- Verify the model is installed: `ollama pull llama3.2:3b`
+<details>
+<summary><strong>Ollama connection error</strong></summary>
 
-### Microphone Not Detected
-- Check audio input device is connected
-- Run `test_microphone.py` to diagnose
-- Verify PyAudio is properly installed
+- Make sure Ollama is running: `ollama serve`
+- Confirm the host is `http://127.0.0.1:11434`
+- Confirm the model is pulled: `ollama pull llama3.2:3b`
+</details>
 
-### Audio Playback Issues
-- Ensure speakers/headphones are connected
-- Check volume levels
-- Verify text-to-speech engine is working
+<details>
+<summary><strong>Microphone not detected</strong></summary>
 
-### Memory Not Persisting
-- Verify `memory.json` is writable
+- Check that an audio input device is connected
+- Run `python test_microphone.py` to diagnose
+- Confirm PyAudio is installed correctly
+</details>
+
+<details>
+<summary><strong>No audio output</strong></summary>
+
+- Check that speakers/headphones are connected and volume is up
+- Confirm the text-to-speech engine (`pyttsx3`/`gtts`) is installed and working
+</details>
+
+<details>
+<summary><strong>Memory not persisting</strong></summary>
+
+- Confirm `memory.json` exists and is writable
 - Check file permissions in the project directory
+</details>
 
-## Future Enhancements
+## Roadmap
 
 - [ ] Multi-language support
 - [ ] Advanced NLP capabilities
 - [ ] Integration with more APIs
-- [ ] Improved wake word detection
-- [ ] Custom skill creation UI
+- [ ] Improved wake-word detection accuracy
+- [ ] UI for creating custom skills
 - [ ] Voice training for better recognition
 - [ ] Conversation logging and analytics
 
 ## Contributing
 
-Contributions are welcome! Please feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Improve documentation
+Contributions are welcome!
+
+1. Fork the repo and create a feature branch
+2. Make your changes
+3. Add or update tests where relevant
+4. Open a pull request describing what you changed and why
+
+Bug reports and feature requests are just as welcome — please open an [issue](https://github.com/isharpz007/OdiAI/issues).
 
 ## License
 
-This project is open-source and available under the MIT License (or specify your preferred license).
-
-## Author
-
-**isharpz007** - [GitHub Profile](https://github.com/isharpz007)
+Released under the [MIT License](LICENSE).
 
 ## Acknowledgments
 
-- [Ollama](https://ollama.ai) - For making local LLMs accessible
-- [PyAudio](https://people.csail.mit.edu/hubert/pyaudio/) - For audio processing
-- [Meta LLaMA](https://www.meta.com/research/llama/) - Foundation model
-
-## Support
-
-For issues, questions, or suggestions, please open an issue on [GitHub Issues](https://github.com/isharpz007/OdiAI/issues).
+- [Ollama](https://ollama.ai) — local LLM runtime
+- [PyAudio](https://people.csail.mit.edu/hubert/pyaudio/) — audio I/O
+- [Meta LLaMA](https://www.meta.com/research/llama/) — foundation model
 
 ---
 
-**Made with ❤️ by isharpz007**
-```
-
-## How to Add This README
-
-Since I don't have write permissions, you can:
-
-1. **Via GitHub Web UI:**
-   - Go to https://github.com/isharpz007/OdiAI
-   - Click "Add file" → "Create new file"
-   - Name it `README.md`
-   - Paste the content above
-   - Commit with message "Add comprehensive README for OdiAI"
-
-2. **Via Git CLI:**
-   ```bash
-   git clone https://github.com/isharpz007/OdiAI.git
-   cd OdiAI
-   # Create README.md and paste the content
-   git add README.md
-   git commit -m "Add comprehensive README for OdiAI"
-   git push
-   ```
-
-The README covers all the essential aspects of the project including features, installation, usage modes, project structure, and troubleshooting!
+**Author:** [isharpz007](https://github.com/isharpz007)
+**Support:** [GitHub Issues](https://github.com/isharpz007/OdiAI/issues)
